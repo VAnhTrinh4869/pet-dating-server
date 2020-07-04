@@ -8,7 +8,7 @@ module.exports.getAll = (req, res) => {
 }
 
 module.exports.insertNewUser = (req, res) => {
-    let sql = 'INSERT INTO user (name, phone, access_token) VALUES (:name, :phone, :access_token)';
+    let sql = 'INSERT INTO user (name, email, access_token) VALUES (:name, :email, :access_token)';
     db.query(sql, { replacements: { ...req.body } })
         .then(result => {
             res.json({
