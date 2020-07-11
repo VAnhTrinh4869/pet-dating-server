@@ -1,21 +1,17 @@
 const jwt = require('jsonwebtoken');
 
 const db = require('../db');
+const common = require('../common');
 
-const buildInsertSql = (body, tbl) => {
-    let sql = `INSERT INTO ${tbl} (`;
-    let values = ` VALUES (`;
-    for (let property in body) {
-        sql += `${property},`;
-        values += `:${property},`;
-    }
-    return sql.slice(0, -1) + ')' + values.slice(0, -1) + ')';
-}
 module.exports.insertNewUser = async (req, res) => {
+    if (!req.body.email) {
+        res.send({ error: 'must be logged in' });
+    }
+
     let beforeInsert = 'SELECT COUNT(1) as count FROM user WHERE email = :email';
     let result = await db.query(beforeInsert, { replacements: { email: req.body.email }, type: db.QueryTypes.SELECT });
     if (result[0].count == 0) {// login not yet
-        let sql = buildInsertSql(req.body, 'user');
+        let sql = common.buildInsertSql(req, 'user');
         db.query(sql, { replacements: { ...req.body } })
             .then(result => {
                 res.json({

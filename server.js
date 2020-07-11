@@ -3,9 +3,10 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const authMiddleware = require('./middlewares/auth.middleware');
 const userRoute = require('./routes/user.route');
 const authRoute = require('./routes/auth.route');
-const authMiddleware = require('./middlewares/auth.middleware');
+const petRoute = require('./routes/pet.route');
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use('/users', authMiddleware.authentication, userRoute);
+app.use('/pets', authMiddleware.authentication, petRoute);
 app.use(authRoute);
 
 app.listen(PORT, () => {
