@@ -1,7 +1,11 @@
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 
 const userRoute = require('./routes/user.route');
+const authRoute = require('./routes/auth.route');
+const authMiddleware = require('./middlewares/auth.middleware');
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -11,7 +15,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.use('/users',userRoute);
+app.use('/users', authMiddleware.authentication, userRoute);
+app.use(authRoute);
 
 app.listen(PORT, () => {
     console.log(`server is running at port ${PORT}`);
