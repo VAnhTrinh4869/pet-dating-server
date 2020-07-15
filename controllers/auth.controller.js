@@ -39,7 +39,7 @@ module.exports.insertNewUser = async (req, res) => {
                     data: {
                         ...user[0]
                     },
-                    pd_token: jwt.sign({ userId: user[0].user_id }, process.env.JWT_KEY),
+                    pd_token: jwt.sign({ userId: user[0].id }, process.env.JWT_KEY),
                     message: 'login successfully!'
                 })
             })
