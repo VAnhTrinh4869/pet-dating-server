@@ -8,20 +8,10 @@ module.exports.buildInsertSql = (req, tbl) => {
     return sql.slice(0, -1) + ')' + values.slice(0, -1) + ')';
 }
 
-module.exports.buildUpdateUserSQL = (req, tbl) => {
+module.exports.buildUpdateSQL = (data, tbl) => {
     let sql = `UPDATE ${tbl} SET `;
-    for (let property in req.body) {
+    for (let property in data.updateFields) {
         sql += `${property} = :${property},`;
     }
-    return sql.slice(0, -1) + ' WHERE user_id = :user_id';
-}
-
-module.exports.buildUpdatePetSQL = (req, tbl) => {
-    let sql = `UPDATE ${tbl} SET `;
-    for (let property in req.body) {
-        if (property != 'pet_id') {
-            sql += `${property} = :${property},`;
-        }
-    }
-    return sql.slice(0, -1) + ' WHERE pet_id = :pet_id';
+    return sql.slice(0, -1) + ' WHERE id = :id';
 }

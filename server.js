@@ -16,9 +16,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.use('/users', authMiddleware.authentication, userRoute);
-app.use('/pets', authMiddleware.authentication, petRoute);
-app.use(authRoute);
+app.use('/api/users', authMiddleware.authentication, userRoute);
+app.use('/api/pets', authMiddleware.authentication, petRoute);
+app.use('/api', authRoute);
 
 app.listen(PORT, () => {
     console.log(`server is running at port ${PORT}`);

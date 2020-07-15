@@ -11,13 +11,13 @@ module.exports.insertNewUser = async (req, res) => {
     let beforeInsert = 'SELECT COUNT(1) as count FROM user WHERE email = :email';
     let result = await db.query(beforeInsert, { replacements: { email: req.body.email }, type: db.QueryTypes.SELECT });
     if (result[0].count == 0) {// login not yet
-        let sql = common.buildInsertSql(req, 'user');
+        let sql = 'INSERT INTO user(name, email) VALUES (:name, :email)';
         db.query(sql, { replacements: { ...req.body } })
             .then(result => {
                 res.json({
                     result: 'ok',
                     data: {
-                        user_id: result[0],
+                        id: result[0],
                         ...req.body
                     },
                     pd_token: jwt.sign({ userId: result[0] }, process.env.JWT_KEY),

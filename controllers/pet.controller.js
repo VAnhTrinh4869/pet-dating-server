@@ -16,8 +16,8 @@ module.exports.getAllPetBreeds = (req, res) => {
 }
 
 module.exports.get = (req, res) => {
-    let sql = 'SELECT * FROM pet WHERE pet_id = :id';
-    db.query(sql, { replacements: { pet_id: req.params.id }, type: db.QueryTypes.SELECT })
+    let sql = 'SELECT * FROM pet WHERE id = :id';
+    db.query(sql, { replacements: { id: req.params.id }, type: db.QueryTypes.SELECT })
         .then(pet => {
             res.json(pet)
         })
@@ -25,12 +25,15 @@ module.exports.get = (req, res) => {
 }
 
 module.exports.updatePet = (req, res) => {
-    let sql = common.buildUpdatePetSQL(req, 'pet');
-    db.query(sql, { replacements: { ...req.body }, type: db.QueryTypes.UPDATE })
+    let sql = common.buildUpdateSQL(req.body, 'pet');
+    db.query(sql, { replacements: { ...req.body.updateFields, id: req.params.id }, type: db.QueryTypes.UPDATE })
         .then(rows => {
             res.json({
                 result: 'ok',
-                message: `${rows[1]} row(s) affected`
+                message: `${rows[1]} row(s) affected`,
+                data: {
+                    ...req.body.updateFields
+                }
             })
         })
         .catch(error => res.json({ error: error }));
@@ -44,7 +47,7 @@ module.exports.createNewPet = (req, res) => {
             res.json({
                 result: 'ok',
                 data: {
-                    pet_id: results[0],
+                    id: results[0],
                     ...req.body
                 },
                 message: 'insert new pet successfull'
