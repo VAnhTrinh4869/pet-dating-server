@@ -14,3 +14,10 @@ module.exports.getProfile = (req, res) => {
         })
         .catch(error => res.json({ error: error }));
 }
+
+module.exports.upload = (req, res) => {
+    res.json({
+        success: 'ok',
+        img_url: `${req.get('host')}/images/${req.file.filename}`
+    })
+}
