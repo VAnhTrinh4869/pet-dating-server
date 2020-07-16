@@ -7,7 +7,7 @@ const authMiddleware = require('./middlewares/auth.middleware');
 const userRoute = require('./routes/user.route');
 const authRoute = require('./routes/auth.route');
 const petRoute = require('./routes/pet.route');
-const apiRoute = require('./routes/api.route')
+const profileRoute = require('./routes/api.route')
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 
 app.use('/api/users', authMiddleware.authentication, userRoute);
 app.use('/api/pets', authMiddleware.authentication, petRoute);
-app.use('/api', authMiddleware.authentication, apiRoute);
+app.use('/api/profile', authMiddleware.authentication, profileRoute);
 app.use('/api', authRoute);
 
 app.listen(PORT, () => {
