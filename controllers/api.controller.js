@@ -1,7 +1,7 @@
 const db = require('../db');
 const common = require('../common');
 
-module.exports.getDrawer = (req, res) => {
+module.exports.getProfile = (req, res) => {
     let sql = `SELECT u.name, u.email, COUNT(DISTINCT(p.id)) AS pets, COUNT(pm.pet_id1) AS matches 
                 FROM user u
                 LEFT JOIN pet p ON u.id = p.user_id
