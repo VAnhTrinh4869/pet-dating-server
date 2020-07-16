@@ -9,4 +9,6 @@ router.get('/:id', controller.get);
 
 router.put('/', controller.updateUser);
 
+router.get('/getDrawer', controller.getDrawer)
+
 module.exports = router;
