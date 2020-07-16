@@ -7,7 +7,7 @@ const authMiddleware = require('./middlewares/auth.middleware');
 const userRoute = require('./routes/user.route');
 const authRoute = require('./routes/auth.route');
 const petRoute = require('./routes/pet.route');
-const profileRoute = require('./routes/api.route')
+const commonRoute = require('./routes/api.route')
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -16,10 +16,11 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
+app.use('/images', express.static('upload/images'))
 
 app.use('/api/users', authMiddleware.authentication, userRoute);
 app.use('/api/pets', authMiddleware.authentication, petRoute);
-app.use('/api/profile', authMiddleware.authentication, profileRoute);
+app.use('/api/common', authMiddleware.authentication, commonRoute);
 app.use('/api', authRoute);
 
 app.listen(PORT, () => {
