@@ -5,7 +5,7 @@ const common = require('../common');
 
 module.exports.insertNewUser = async (req, res) => {
     if (!req.body.email) {
-        res.send({ error: 'must be logged in' });
+        res.send(res.status(422).send('you must be logged in'));
     }
 
     let beforeInsert = 'SELECT COUNT(1) as count FROM user WHERE email = :email';
@@ -24,11 +24,7 @@ module.exports.insertNewUser = async (req, res) => {
                     message: 'login successfully!'
                 })
             }).catch(error => {
-                res.json({
-                    result: 'failed',
-                    data: {},
-                    message: `Error is ${error}`
-                })
+                res.status(422).send(error)
             });
     } else {
         let sql = 'SELECT * FROM user WHERE email = :email';
