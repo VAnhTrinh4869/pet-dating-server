@@ -2,7 +2,7 @@ const db = require('../db');
 const common = require('../common');
 
 module.exports.getAll = (req, res) => {
-    let sql = 'SELECT * FROM pet WHERE user_id = :user_id';
+    let sql = 'SELECT * FROM pet WHERE user_id = :user_id ORDER BY id DESC';
     db.query(sql, { replacements: { user_id: req.userId }, type: db.QueryTypes.SELECT })
         .then(pets => res.json(pets))
         .catch(error => res.json({ error: error }));
@@ -70,7 +70,7 @@ module.exports.createNewPet = (req, res) => {
             })
         })
         .catch(error => {
-            res.json({
+            res.status(442).json({
                 result: 'failed',
                 data: {},
                 message: 'error: ' + error.message
