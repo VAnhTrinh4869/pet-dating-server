@@ -28,16 +28,7 @@ module.exports.get = (req, res) => {
         .then(pet => {
             res.json(pet)
         })
-        .catch(error => res.json({ error: error }));
-}
-
-module.exports.get = (req, res) => {
-    let sql = 'SELECT * FROM pet WHERE id = :id';
-    db.query(sql, { replacements: { id: req.params.id }, type: db.QueryTypes.SELECT })
-        .then(pet => {
-            res.json(pet)
-        })
-        .catch(error => res.json({ error: error }));
+        .catch(error => res.status(422).json({ error: error }));
 }
 
 module.exports.updatePet = (req, res) => {
@@ -48,6 +39,7 @@ module.exports.updatePet = (req, res) => {
                 result: 'ok',
                 message: `${rows[1]} row(s) affected`,
                 data: {
+                    id: req.params.id,
                     ...req.body.updateFields
                 }
             })
@@ -86,5 +78,5 @@ module.exports.deletePet = (req, res) => {
                 result: 'ok',
                 message: `${result[1]} row(s) affected`
             })
-        }).catch(error => res.json({ error: error }));
+        }).catch(error => res.status(422).json({ error: error }));
 }
