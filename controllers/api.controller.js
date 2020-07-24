@@ -21,3 +21,35 @@ module.exports.upload = (req, res) => {
         img_url: `${req.get('host')}/images/${req.file.filename}`
     })
 }
+
+module.exports.react = (req, res) => {
+    let sql = 'INSERT INTO pet_reaction(user_id, pet_id, reaction) VALUES (:user_id, :pet_id, :reaction)';
+    db.query(sql, { replacements: { user_id: req.userId, pet_id: req.body.pet_id, reaction: req.body.reaction } })
+        .then(result => {
+            res.json({
+                result: 'ok',
+                data: {
+                    id: result[0],
+                    user_id: req.userId,
+                    pet_id: req.body.pet_id,
+                    reaction: req.body.reaction
+                }
+            })
+        })
+        .catch(error => res.status(422).json({ error: error }))
+}
+module.exports.match = (req, res) => {
+    let sql = 'INSERT INTO pet_match(user1, pet_id1, user2, pet_id2) VALUES (:user1, :pet_id1, :user2, :pet_id2)';
+    db.query(sql, { replacements: { user1: req.userId, ...req.body } })
+        .then(result => {
+            res.json({
+                result: 'ok',
+                data: {
+                    id: result[0],
+                    user1: req.userId,
+                    ...req.body
+                }
+            })
+        })
+        .catch(error => res.status(422).json({ error: error }))
+}
