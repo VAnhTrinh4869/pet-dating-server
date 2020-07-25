@@ -80,3 +80,19 @@ module.exports.deletePet = (req, res) => {
             })
         }).catch(error => res.status(422).json({ error: error }));
 }
+
+module.exports.setActivePet = (req, res) => {
+    let sql = 'UPDATE pet SET is_active = 0 WHERE user_id = :user_id';
+    db.query(sql, { replacements: { user_id: req.userId }, type: db.QueryTypes.UPDATE })
+        .then(result => {
+            sql = 'UPDATE pet SET is_active = 1 WHERE user_id = :user_id AND id = :pet_id';
+            return db.query(sql, { replacements: { pet_id: req.body.pet_id, user_id: req.userId }, type: db.QueryTypes.UPDATE })
+        })
+        .then(result => {
+            res.json({
+                result: 'ok',
+                message: `${result[1]} row(s) affected`
+            })
+        })
+        .catch(error => res.status(422).json({ error: error }));
+}
