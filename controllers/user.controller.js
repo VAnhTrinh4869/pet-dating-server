@@ -2,15 +2,15 @@ const db = require('../db');
 const common = require('../common');
 
 module.exports.getCurrentUser = (req, res) => {
-    let sql = 'SELECT * FROM user WHERE id = :id';
-    db.query(sql, { replacements: { id: req.userId }, type: db.QueryTypes.SELECT })
+    let sql = 'SELECT * FROM user WHERE uid = :uid';
+    db.query(sql, { replacements: { uid: req.userId }, type: db.QueryTypes.SELECT })
         .then(users => res.json(users))
         .catch(error => res.json({ error: error }));
 }
 
 module.exports.get = (req, res) => {
-    let sql = 'SELECT * FROM user WHERE id = :id';
-    db.query(sql, { replacements: { id: req.params.id }, type: db.QueryTypes.SELECT })
+    let sql = 'SELECT * FROM user WHERE uid = :uid';
+    db.query(sql, { replacements: { uid: req.params.uid }, type: db.QueryTypes.SELECT })
         .then(user => {
             res.json(user)
         })
@@ -18,8 +18,8 @@ module.exports.get = (req, res) => {
 }
 
 module.exports.updateUser = (req, res) => {
-    let sql = common.buildUpdateSQL(req.body, 'user');
-    db.query(sql, { replacements: { ...req.body.updateFields, id: req.userId }, type: db.QueryTypes.UPDATE })
+    let sql = common.buildUpdateUserSQL(req.body, 'user');
+    db.query(sql, { replacements: { ...req.body.updateFields, uid: req.userId }, type: db.QueryTypes.UPDATE })
         .then(rows => {
             res.json({
                 result: 'ok',

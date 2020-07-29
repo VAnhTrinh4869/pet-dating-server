@@ -23,7 +23,9 @@ module.exports.getAllPetBreeds = (req, res) => {
 }
 
 module.exports.get = (req, res) => {
-    let sql = 'SELECT * FROM pet WHERE id = :id';
+    let sql = `SELECT p.*, pb.name AS breed_name FROM pet p
+            LEFT JOIN pet_breed pb ON p.breed = pb.id
+            WHERE p.id = :id`;
     db.query(sql, { replacements: { id: req.params.id }, type: db.QueryTypes.SELECT })
         .then(pet => {
             res.json(pet)

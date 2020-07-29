@@ -15,3 +15,10 @@ module.exports.buildUpdateSQL = (data, tbl) => {
     }
     return sql.slice(0, -1) + ' WHERE id = :id';
 }
+module.exports.buildUpdateUserSQL = (data, tbl) => {
+    let sql = `UPDATE ${tbl} SET `;
+    for (let property in data.updateFields) {
+        sql += `${property} = :${property},`;
+    }
+    return sql.slice(0, -1) + ' WHERE uid = :uid';
+}
