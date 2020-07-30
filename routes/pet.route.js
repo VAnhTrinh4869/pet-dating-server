@@ -13,6 +13,8 @@ router.get('/:id', controller.get);
 
 router.post('/', controller.createNewPet);
 
+router.post('/:id/pictures', controller.insertPictures);
+
 router.put('/setActive', controller.setActivePet);
 
 router.put('/:id', controller.updatePet);

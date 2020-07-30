@@ -108,3 +108,18 @@ module.exports.setActivePet = (req, res) => {
         })
         .catch(error => res.status(422).json({ error: error }));
 }
+
+module.exports.insertPictures = (req, res) => {
+    let sql = 'INSERT INTO pet_feature(pet_id, img_url) VALUES ';
+    let pictures = req.body.pictures;
+    let pet_id = req.params.id;
+    let values = pictures.map(pic => `(${pet_id},'${pic}')`).join(',');
+    db.query(sql + values)
+        .then(results => {
+            res.json({
+                result: 'ok',
+                message: `${results[1]} row(s) affected`
+            })
+        })
+        .catch(error => res.status(422).json({ error: error }));
+}
