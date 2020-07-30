@@ -23,12 +23,22 @@ module.exports.getAllPetBreeds = (req, res) => {
 }
 
 module.exports.get = (req, res) => {
-    let sql = `SELECT p.*, pb.name AS breed_name FROM pet p
+    let sql = `SELECT p.*, pb.name,GROUP_CONCAT(pf.img_url) AS pictures FROM pet p
             LEFT JOIN pet_breed pb ON p.breed = pb.id
-            WHERE p.id = :id`;
+            LEFT JOIN pet_feature pf ON p.id = pf.pet_id
+            WHERE p.id = :id
+            GROUP BY p.id`;
     db.query(sql, { replacements: { id: req.params.id }, type: db.QueryTypes.SELECT })
-        .then(pet => {
-            res.json(pet)
+        .then(pets => {
+            let pet = pets[0];
+            let pictures = [];
+            if (pet.pictures) {
+                pictures = pet.pictures.split(',');
+            }
+            res.json({
+                ...pet,
+                pictures: pictures
+            })
         })
         .catch(error => res.status(422).json({ error: error }));
 }
