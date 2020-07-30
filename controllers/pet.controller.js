@@ -23,7 +23,7 @@ module.exports.getAllPetBreeds = (req, res) => {
 }
 
 module.exports.get = (req, res) => {
-    let sql = `SELECT p.*, pb.name,GROUP_CONCAT(pf.img_url) AS pictures FROM pet p
+    let sql = `SELECT p.*, pb.name as breed_name,GROUP_CONCAT(pf.img_url) AS pictures FROM pet p
             LEFT JOIN pet_breed pb ON p.breed = pb.id
             LEFT JOIN pet_feature pf ON p.id = pf.pet_id
             WHERE p.id = :id
