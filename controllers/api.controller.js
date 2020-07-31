@@ -38,18 +38,38 @@ module.exports.react = (req, res) => {
         })
         .catch(error => res.status(422).json({ error: error }))
 }
-module.exports.match = (req, res) => {
-    let sql = 'INSERT INTO pet_match(user1, pet_id1, user2, pet_id2) VALUES (:user1, :pet_id1, :user2, :pet_id2)';
-    db.query(sql, { replacements: { user1: req.userId, ...req.body } })
-        .then(result => {
+module.exports.match = async (req, res) => {
+    try {
+        let sql = 'INSERT INTO pet_match(user1, pet_id1, user2, pet_id2) VALUES (:user1, :pet_id1, :user2, :pet_id2)';
+        await db.query(sql, { replacements: { user1: req.userId, ...req.body } })
+        let checkMatch = `SELECT user1,u1.name AS username1, 
+                    p1.name AS petname1,
+                    user2,u2.name AS username2, 
+                    p2.name AS petname2
+                    FROM pet_match pm
+                    INNER JOIN user u1 ON u1.uid = pm.user1
+                    INNER JOIN user u2 ON u2.uid = pm.user2
+                    INNER JOIN pet p1 ON pm.pet_id1 = p1.id
+                    INNER JOIN pet p2 ON pm.pet_id2 = p2.id
+                    WHERE pm.pet_id1 = :pet_id2 AND pm.pet_id2 = :pet_id1`;
+        const matches = await db.query(checkMatch, { replacements: { ...req.body }, type: db.QueryTypes.SELECT })
+        console.log(matches)
+        if (matches.length == 0) {
+            res.json({
+                result: 'not ok',
+                data: {},
+                message: 'waiting for love'
+            })
+        } else {
             res.json({
                 result: 'ok',
-                data: {
-                    id: result[0],
-                    user1: req.userId,
-                    ...req.body
-                }
+                data: { ...matches[0] },
+                message: 'match successfull'
             })
-        })
-        .catch(error => res.status(422).json({ error: error }))
+        }
+    } catch (error) {
+        res.status(422).json({ error: error })
+    }
+
+
 }
