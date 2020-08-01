@@ -42,11 +42,11 @@ module.exports.match = async (req, res) => {
     try {
         let sql = 'INSERT INTO pet_match(user1, pet_id1, user2, pet_id2) VALUES (:user1, :pet_id1, :user2, :pet_id2)';
         await db.query(sql, { replacements: { user1: req.userId, ...req.body } })
-        let checkMatch = `SELECT pm.user2 AS guestUid,u2.name AS guestName,
-                    p2.name AS guestPet
+        let checkMatch = `SELECT pm.user1 AS guestUid,u1.name AS guestName,
+                    p1.name AS guestPet
                     FROM pet_match pm
-                    INNER JOIN USER u2 ON u2.uid = pm.user2
-                    INNER JOIN pet p2 ON pm.pet_id2 = p2.id
+                    INNER JOIN USER u1 ON u1.uid = pm.user1
+                    INNER JOIN pet p1 ON pm.pet_id1 = p1.id
                     WHERE pm.pet_id1 = :pet_id2 AND pm.pet_id2 = :pet_id1`;
         const matches = await db.query(checkMatch, { replacements: { ...req.body }, type: db.QueryTypes.SELECT })
         console.log(matches)
