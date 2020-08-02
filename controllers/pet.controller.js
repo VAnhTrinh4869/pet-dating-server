@@ -31,6 +31,25 @@ module.exports.getOthersPet = (req, res) => {
         .catch(error => res.json({ error: error }));
 }
 
+module.exports.getAllOthersPet = (req, res) => {
+    let sql = `SELECT p.id, p.user_id, p.name, p.avatar, GROUP_CONCAT(pf.img_url) AS pictures 
+            FROM pet p
+            LEFT JOIN pet_feature pf ON p.id = pf.pet_id
+            WHERE p.user_id != :user_id 
+            GROUP BY p.id
+            ORDER BY RAND() LIMIT 50`;
+    db.query(sql, { replacements: { user_id: req.userId }, type: db.QueryTypes.SELECT })
+        .then(pets => {
+            let newPets = pets.map(pet => {
+                let pictures = [];
+                if (pet.pictures) pictures = pet.pictures.split(',');
+                return { ...pet, pictures: pictures }
+            })
+            res.json(newPets)
+        })
+        .catch(error => res.json({ error: error }));
+}
+
 module.exports.getAllPetBreeds = (req, res) => {
     let sql = 'SELECT * FROM pet_breed';
     db.query(sql, { type: db.QueryTypes.SELECT })

@@ -9,6 +9,8 @@ router.get('/breeds', controller.getAllPetBreeds);
 
 router.get('/others', controller.getOthersPet);
 
+router.get('/allOthers', controller.getAllOthersPet);
+
 router.get('/:id', controller.get);
 
 router.post('/', controller.createNewPet);
