@@ -41,7 +41,9 @@ module.exports.insertNewUser = async (req, res) => {
                 res.json({
                     data: {
                         is_block: 1,
-                        remainTime: `${h}h ${m}m ${s}s`
+                        remainTime: `${h}h ${m}m ${s}s`,
+                        ms: ms,
+                        now: new Date()
                     }
                 })
             } else {
