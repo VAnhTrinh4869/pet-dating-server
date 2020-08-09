@@ -7,8 +7,8 @@ module.exports.getCurrentUser = (req, res) => {
         .then(user => {
             if (user[0].is_block == 1) {
                 const block_deadline = user[0].block_deadline;
-                const TIME_ZONE = new Date().getTimezoneOffset();
-                const ms = new Date(block_deadline).getTime() + TIME_ZONE * 60 * 1000 - new Date().getTime();
+                // const TIME_ZONE = new Date().getTimezoneOffset();
+                const ms = new Date(block_deadline).getTime() - new Date().getTime();
                 const second = Math.floor(ms / 1000);
                 const h = Math.floor(second / 3600);
                 const m = Math.floor((second - 3600 * h) / 60);
