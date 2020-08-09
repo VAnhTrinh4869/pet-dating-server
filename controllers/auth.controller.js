@@ -27,9 +27,24 @@ module.exports.insertNewUser = async (req, res) => {
                 res.status(422).send(error)
             });
     } else {
-        let sql = 'SELECT * FROM user WHERE uid = :uid';
-        db.query(sql, { replacements: { uid: req.body.uid }, type: db.QueryTypes.SELECT })
-            .then(user => {
+        try {
+            let sql = 'SELECT * FROM user WHERE uid = :uid';
+            const user = await db.query(sql, { replacements: { uid: req.body.uid }, type: db.QueryTypes.SELECT });
+            if (user[0].is_block == 1) {
+                const block_deadline = user[0].block_deadline;
+                const TIME_ZONE = new Date().getTimezoneOffset();
+                const ms = new Date(block_deadline).getTime() + TIME_ZONE * 60 * 1000 - new Date().getTime();
+                const second = Math.floor(ms / 1000);
+                const h = Math.floor(second / 3600);
+                const m = Math.floor((second - 3600 * h) / 60);
+                const s = Math.floor(second - 3600 * h - 60 * m);
+                res.json({
+                    data: {
+                        is_block: 1,
+                        remainTime: `${h}h ${m}m ${s}s`
+                    }
+                })
+            } else {
                 res.json({
                     result: 'ok',
                     data: {
@@ -38,7 +53,10 @@ module.exports.insertNewUser = async (req, res) => {
                     pd_token: jwt.sign({ userId: user[0].uid }, process.env.JWT_KEY),
                     message: 'login successfully!'
                 })
-            })
-            .catch(error => res.status(422).send(error));
+            }
+
+        } catch (error) {
+            res.status(422).send(error)
+        }
     }
 }

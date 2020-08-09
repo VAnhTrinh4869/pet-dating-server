@@ -4,7 +4,25 @@ const common = require('../common');
 module.exports.getCurrentUser = (req, res) => {
     let sql = 'SELECT * FROM user WHERE uid = :uid';
     db.query(sql, { replacements: { uid: req.userId }, type: db.QueryTypes.SELECT })
-        .then(users => res.json(users))
+        .then(user => {
+            if (user[0].is_block == 1) {
+                const block_deadline = user[0].block_deadline;
+                const TIME_ZONE = new Date().getTimezoneOffset();
+                const ms = new Date(block_deadline).getTime() + TIME_ZONE * 60 * 1000 - new Date().getTime();
+                const second = Math.floor(ms / 1000);
+                const h = Math.floor(second / 3600);
+                const m = Math.floor((second - 3600 * h) / 60);
+                const s = Math.floor(second - 3600 * h - 60 * m);
+                res.json({
+                    is_block: 1,
+                    remainTime: `${h}h ${m}m ${s}s`
+                })
+            } else {
+                res.json({
+                    ...user[0]
+                })
+            }
+        })
         .catch(error => res.json({ error: error }));
 }
 
