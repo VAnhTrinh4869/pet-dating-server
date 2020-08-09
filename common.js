@@ -1,3 +1,5 @@
+const db = require('./db');
+
 module.exports.buildInsertSql = (req, tbl) => {
     let sql = `INSERT INTO ${tbl} (`;
     let values = ` VALUES (`;
@@ -15,10 +17,20 @@ module.exports.buildUpdateSQL = (data, tbl) => {
     }
     return sql.slice(0, -1) + ' WHERE id = :id';
 }
+
 module.exports.buildUpdateUserSQL = (data, tbl) => {
     let sql = `UPDATE ${tbl} SET `;
     for (let property in data.updateFields) {
         sql += `${property} = :${property},`;
     }
     return sql.slice(0, -1) + ' WHERE uid = :uid';
+}
+
+module.exports.enableUser = async (uid) => {
+    try {
+        let sql = 'UPDATE user SET is_block = 0 WHERE uid = :uid';
+        return await db.query(sql, { replacements: { uid: uid }, type: db.QueryTypes.UPDATE })
+    } catch (error) {
+        throw error
+    }
 }

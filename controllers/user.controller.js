@@ -1,14 +1,15 @@
 const db = require('../db');
 const common = require('../common');
 
-module.exports.getCurrentUser = (req, res) => {
-    let sql = 'SELECT * FROM user WHERE uid = :uid';
-    db.query(sql, { replacements: { uid: req.userId }, type: db.QueryTypes.SELECT })
-        .then(user => {
-            if (user[0].is_block == 1) {
-                const block_deadline = user[0].block_deadline;
-                // const TIME_ZONE = new Date().getTimezoneOffset();
-                const ms = new Date(block_deadline).getTime() - new Date().getTime();
+module.exports.getCurrentUser = async (req, res) => {
+    try {
+        let sql = 'SELECT * FROM user WHERE uid = :uid';
+        const user = await db.query(sql, { replacements: { uid: req.userId }, type: db.QueryTypes.SELECT });
+        if (user[0].is_block == 1) {
+            const block_deadline = user[0].block_deadline;
+            // const TIME_ZONE = new Date().getTimezoneOffset();
+            const ms = new Date(block_deadline).getTime() - new Date().getTime();
+            if (ms > 0) {
                 const second = Math.floor(ms / 1000);
                 const h = Math.floor(second / 3600);
                 const m = Math.floor((second - 3600 * h) / 60);
@@ -17,13 +18,18 @@ module.exports.getCurrentUser = (req, res) => {
                     is_block: 1,
                     remainTime: `${h}h ${m}m ${s}s`
                 })
+                return;
             } else {
-                res.json({
-                    ...user[0]
-                })
+                //open
+                await common.enableUser(req.userId)
             }
+        }
+        res.json({
+            ...user[0]
         })
-        .catch(error => res.json({ error: error }));
+    } catch (error) {
+        res.json({ error: error })
+    }
 }
 
 module.exports.get = (req, res) => {
