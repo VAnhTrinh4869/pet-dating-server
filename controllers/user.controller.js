@@ -154,3 +154,20 @@ module.exports.filter = async (req, res) => {
         res.status(422).json({ error: error })
     }
 }
+
+module.exports.upgradeToPremium = async (req, res) => {
+    try {
+        let sql = `INSERT INTO user_vip(uid, confirm_img) VALUES (:uid, :confirm_img)`;
+        const results = await db.query(sql, { replacements: { uid: req.userId, confirm_img: req.body.confirm_img } });
+        res.json({
+            result: 'ok',
+            data: {
+                id: results[0],
+                uid: req.userId,
+                confirm_img: req.body.confirm_img
+            }
+        })
+    } catch (error) {
+        res.status(422).json({ error: error })
+    }
+}
