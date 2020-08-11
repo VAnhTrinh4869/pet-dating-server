@@ -5,7 +5,11 @@ const controller = require('../controllers/user.controller');
 
 router.get('/currentUser', controller.getCurrentUser);
 
+router.get('/filter', controller.filter);
+
 router.get('/:uid', controller.get);
+
+router.post('/location', controller.setLocation);
 
 router.put('/', controller.updateUser);
 

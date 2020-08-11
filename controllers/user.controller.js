@@ -1,3 +1,5 @@
+const geolib = require('geolib');
+
 const db = require('../db');
 const common = require('../common');
 
@@ -68,4 +70,87 @@ module.exports.getDrawer = (req, res) => {
             res.json(results)
         })
         .catch(error => res.json({ error: error }));
+}
+
+const checkLocationExist = async (req) => {
+    try {
+        let sql = `SELECT COUNT(1) AS count FROM location WHERE user_id = :user_id`;
+        return await db.query(sql, { replacements: { user_id: req.userId }, type: db.QueryTypes.SELECT })
+    } catch (error) {
+        throw error
+    }
+}
+
+const insertLocation = async (req) => {
+    try {
+        let sql = `INSERT INTO location(user_id, latitude, longitude) VALUES (:user_id, :latitude, :longitude)`;
+        return await db.query(sql, { replacements: { user_id: req.userId, latitude: req.body.latitude, longitude: req.body.longitude } })
+    } catch (error) {
+        throw error
+    }
+}
+
+const updateLocation = async (req) => {
+    try {
+        let sql = `UPDATE location SET latitude = :latitude, longitude = :longitude WHERE user_id = :user_id`;
+        return await db.query(sql, { replacements: { user_id: req.userId, latitude: req.body.latitude, longitude: req.body.longitude }, type: db.QueryTypes.UPDATE })
+    } catch (error) {
+        throw error
+    }
+}
+
+module.exports.setLocation = async (req, res) => {
+    try {
+        const result = await checkLocationExist(req);
+        if (result[0].count == 0) {
+            await insertLocation(req)
+        } else {
+            await updateLocation(req)
+        }
+        res.json({
+            result: 'ok',
+            data: {
+                user_id: req.userId,
+                ...req.body
+            }
+        })
+    } catch (error) {
+        res.status(422).json({ error: error })
+    }
+}
+
+const getUsersLocation = async (req) => {
+    try {
+        let sql = `SELECT u.uid, u.name, u.avatar, l.latitude, l.longitude
+                FROM user u
+                INNER JOIN location l ON u.uid = l.user_id
+                WHERE u.uid != :user_id`;
+        return await db.query(sql, { replacements: { user_id: req.userId }, type: db.QueryTypes.SELECT })
+    } catch (error) {
+        throw error
+    }
+}
+
+module.exports.filter = async (req, res) => {
+    try {
+        const DISTANCE = req.query.distance;
+        const myLocation = { latitude: req.query.latitude, longitude: req.query.longitude }
+        const users_raw = await getUsersLocation(req);
+        const users = users_raw.map(user => {
+            const dis = geolib.getDistance(myLocation, { latitude: user.latitude, longitude: user.longitude }) // unit = meter
+            const disToKm = Math.round(dis * 100 / 1000) / 100
+            return {
+                name: user.name,
+                avatar: user.avatar,
+                distance: disToKm
+            }
+        }).filter(user => user.distance <= DISTANCE)
+        res.json({
+            result: users.length,
+            data: users
+        })
+
+    } catch (error) {
+        res.status(422).json({ error: error })
+    }
 }
