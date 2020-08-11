@@ -121,7 +121,7 @@ module.exports.setLocation = async (req, res) => {
 
 const getUsersLocation = async (req) => {
     try {
-        let sql = `SELECT u.uid, u.name, u.avatar, l.latitude, l.longitude
+        let sql = `SELECT u.uid, u.name, u.avatar, u.is_vip,l.latitude, l.longitude
                 FROM user u
                 INNER JOIN location l ON u.uid = l.user_id
                 WHERE u.uid != :user_id`;
@@ -138,13 +138,16 @@ module.exports.filter = async (req, res) => {
         const users_raw = await getUsersLocation(req);
         const users = users_raw.map(user => {
             const dis = geolib.getDistance(myLocation, { latitude: user.latitude, longitude: user.longitude }) // unit = meter
+
             const disToKm = Math.round(dis * 100 / 1000) / 100
             return {
+                uid: user.uid,
                 name: user.name,
                 avatar: user.avatar,
+                is_vip: user.is_vip || 0,
                 distance: disToKm
             }
-        }).filter(user => user.distance <= DISTANCE)
+        }).filter(user => user.distance <= DISTANCE).sort((a, b) => a.distance - b.distance)
         res.json({
             result: users.length,
             data: users
