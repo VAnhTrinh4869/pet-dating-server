@@ -183,3 +183,17 @@ module.exports.getAllInfomation = (req, res) => {
         })
         .catch(error => res.status(422).json({ error: error }));
 }
+
+module.exports.getTopLike = (req, res) => {
+    let sql = `SELECT p.id, p.name, p.gender, p.avatar, COUNT(p.id) AS likes
+            FROM pet_reaction pr
+            INNER JOIN pet p ON pr.pet_id = p.id
+            GROUP BY p.id
+            ORDER BY likes DESC
+            LIMIT 10`;
+    db.query(sql, { type: db.QueryTypes.SELECT })
+        .then(pets => {
+            res.json(pets)
+        })
+        .catch(error => res.status(422).json({ error: error }));
+}
