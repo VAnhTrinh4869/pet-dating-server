@@ -158,3 +158,28 @@ module.exports.insertPictures = (req, res) => {
         })
         .catch(error => res.status(422).json({ error: error }));
 }
+
+module.exports.getAllInfomation = (req, res) => {
+    let sql = `SELECT p.id, p.user_id, p.name, p.avatar, pb.name AS breed_name, p.introduction, p.age, p.weight,
+            u.name AS user_name, u.avatar AS user_avatar,
+            GROUP_CONCAT(pf.img_url) AS pictures
+            FROM pet p
+            INNER JOIN pet_breed pb ON p.breed = pb.id
+            INNER JOIN user u ON p.user_id = u.uid
+            LEFT JOIN pet_feature pf ON p.id = pf.pet_id
+            WHERE p.id = :id
+            GROUP BY p.id`;
+    db.query(sql, { replacements: { id: req.params.id }, type: db.QueryTypes.SELECT })
+        .then(pets => {
+            let pet = pets[0];
+            let pictures = [];
+            if (pet.pictures) {
+                pictures = pet.pictures.split(',');
+            }
+            res.json({
+                ...pet,
+                pictures: pictures
+            })
+        })
+        .catch(error => res.status(422).json({ error: error }));
+}

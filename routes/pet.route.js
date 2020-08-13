@@ -13,6 +13,8 @@ router.get('/allOthers', controller.getAllOthersPet);
 
 router.get('/:id', controller.get);
 
+router.get('/:id/allInfo', controller.getAllInfomation);
+
 router.post('/', controller.createNewPet);
 
 router.post('/:id/pictures', controller.insertPictures);
