@@ -174,3 +174,25 @@ module.exports.upgradeToPremium = async (req, res) => {
         res.status(422).json({ error: error })
     }
 }
+
+module.exports.getUserAndPet = (req, res) => {
+    let sql = `SELECT u.name, u.email, u.gender, u.birth_date, u.phone, u.avatar,p.id AS pet_id, p.avatar AS pet_avatar
+            FROM user u 
+            LEFT JOIN pet p ON u.uid = p.user_id
+            WHERE u.uid = :uid`;
+    db.query(sql, { replacements: { uid: req.params.uid }, type: db.QueryTypes.SELECT })
+        .then(users => {
+            const pets = users.map(u => ({ id: u.pet_id, avatar: u.pet_avatar }))
+            const user = users[0];
+            res.json({
+                name: user.name,
+                email: user.email,
+                gender: user.gender,
+                birth_date: user.birth_date,
+                phone: user.phone,
+                avatar: user.avatar,
+                pets: pets
+            })
+        })
+        .catch(error => res.json({ error: error }));
+}

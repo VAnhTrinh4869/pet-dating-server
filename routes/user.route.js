@@ -9,6 +9,8 @@ router.get('/filter', controller.filter);
 
 router.get('/:uid', controller.get);
 
+router.get('/:uid/allInfo', controller.getUserAndPet);
+
 router.post('/location', controller.setLocation);
 
 router.post('/toPremium', controller.upgradeToPremium);
