@@ -197,3 +197,17 @@ module.exports.getTopLike = (req, res) => {
         })
         .catch(error => res.status(422).json({ error: error }));
 }
+
+module.exports.updateMatch = (req, res) => {
+    let condition = req.body.pet_ids.join(',')
+    let sql = `UPDATE pet SET matches = matches + 1 WHERE id IN (${condition})`;
+
+    db.query(sql, { type: db.QueryTypes.UPDATE })
+        .then(result => {
+            res.json({
+                result: 'ok',
+                message: `${result[1]} row(s) affected`
+            })
+        })
+        .catch(error => res.status(422).json({ error: error }));
+}

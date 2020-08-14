@@ -23,6 +23,8 @@ router.post('/:id/pictures', controller.insertPictures);
 
 router.put('/setActive', controller.setActivePet);
 
+router.put('/updateMatch', controller.updateMatch);
+
 router.put('/:id', controller.updatePet);
 
 router.delete('/:id', controller.deletePet);
