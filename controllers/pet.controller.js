@@ -211,3 +211,17 @@ module.exports.updateMatch = (req, res) => {
         })
         .catch(error => res.status(422).json({ error: error }));
 }
+
+module.exports.getTopMatch = (req, res) => {
+    let sql = `SELECT p.id, p.name, pb.name AS breed_name, p.avatar, p.age, p.gender, p.weight, matches 
+            FROM pet p
+            INNER JOIN pet_breed pb ON p.breed = pb.id
+            WHERE matches > 0
+            ORDER BY matches DESC
+            LIMIT 10`;
+    db.query(sql, { type: db.QueryTypes.SELECT })
+        .then(pets => {
+            res.json(pets)
+        })
+        .catch(error => res.status(422).json({ error: error }));
+}

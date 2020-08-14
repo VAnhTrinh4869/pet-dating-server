@@ -13,6 +13,8 @@ router.get('/allOthers', controller.getAllOthersPet);
 
 router.get('/topLike', controller.getTopLike);
 
+router.get('/topMatch', controller.getTopMatch);
+
 router.get('/:id', controller.get);
 
 router.get('/:id/allInfo', controller.getAllInfomation);
