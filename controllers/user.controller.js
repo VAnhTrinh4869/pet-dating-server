@@ -176,7 +176,7 @@ module.exports.upgradeToPremium = async (req, res) => {
 }
 
 module.exports.getUserAndPet = (req, res) => {
-    let sql = `SELECT u.name, u.email, u.gender, u.birth_date, u.phone, u.avatar,p.id AS pet_id, p.avatar AS pet_avatar
+    let sql = `SELECT u.name, u.email, u.gender, u.birth_date, u.phone, u.avatar, u.is_vip, p.id AS pet_id, p.avatar AS pet_avatar
             FROM user u 
             LEFT JOIN pet p ON u.uid = p.user_id
             WHERE u.uid = :uid`;
@@ -191,8 +191,9 @@ module.exports.getUserAndPet = (req, res) => {
                 birth_date: user.birth_date,
                 phone: user.phone,
                 avatar: user.avatar,
+                is_vip: is_vip,
                 pets: pets
             })
         })
-        .catch(error => res.json({ error: error }));
+        .catch(error => res.status(422).json({ error: error }));
 }

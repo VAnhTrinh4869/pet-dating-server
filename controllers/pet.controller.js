@@ -160,7 +160,7 @@ module.exports.insertPictures = (req, res) => {
 }
 
 module.exports.getAllInfomation = (req, res) => {
-    let sql = `SELECT p.id, p.user_id, p.name, p.avatar, pb.name AS breed_name, p.introduction, p.age, p.weight,
+    let sql = `SELECT p.id, p.user_id, p.name, p.avatar, p.gender, pb.name AS breed_name, p.introduction, p.age, p.weight,
             u.name AS user_name, u.avatar AS user_avatar,
             GROUP_CONCAT(pf.img_url) AS pictures
             FROM pet p
