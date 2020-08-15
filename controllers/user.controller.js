@@ -55,7 +55,7 @@ module.exports.updateUser = (req, res) => {
                 }
             })
         })
-        .catch(error => res.json({ error: error }));
+        .catch(error => { res.json({ error: error }) });
 }
 
 module.exports.getDrawer = (req, res) => {
@@ -191,9 +191,11 @@ module.exports.getUserAndPet = (req, res) => {
                 birth_date: user.birth_date,
                 phone: user.phone,
                 avatar: user.avatar,
-                is_vip: is_vip,
+                is_vip: user.is_vip,
                 pets: pets
             })
         })
-        .catch(error => res.status(422).json({ error: error }));
+        .catch(error => {
+            res.status(422).json({ error })
+        });
 }
