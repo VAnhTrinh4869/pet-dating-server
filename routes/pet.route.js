@@ -15,6 +15,8 @@ router.get('/topLike', controller.getTopLike);
 
 router.get('/topMatch', controller.getTopMatch);
 
+router.get('/isMatch', controller.isMatch);
+
 router.get('/:id', controller.get);
 
 router.get('/:id/allInfo', controller.getAllInfomation);

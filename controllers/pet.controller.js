@@ -225,3 +225,15 @@ module.exports.getTopMatch = (req, res) => {
         })
         .catch(error => res.status(422).json({ error: error }));
 }
+
+module.exports.isMatch = (req, res) => {
+    let sql = `SELECT COUNT(*) as count FROM pet_match WHERE pet_id1 = :pet_active AND pet_id2 = :pet2`;
+    db.query(sql, { replacements: { ...req.query }, type: db.QueryTypes.SELECT })
+        .then(results => {
+            res.json({ isMatch: results[0].count > 0 })
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(422).json({ error: error })
+        });
+}
