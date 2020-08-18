@@ -23,6 +23,8 @@ router.get('/:id/allInfo', controller.getAllInfomation);
 
 router.post('/', controller.createNewPet);
 
+router.post('/report', controller.report);
+
 router.post('/:id/pictures', controller.insertPictures);
 
 router.put('/setActive', controller.setActivePet);

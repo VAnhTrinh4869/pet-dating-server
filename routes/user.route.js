@@ -15,6 +15,8 @@ router.post('/location', controller.setLocation);
 
 router.post('/toPremium', controller.upgradeToPremium);
 
+router.post('/feedback', controller.feedback);
+
 router.put('/', controller.updateUser);
 
 // router.get('/getDrawer', controller.getDrawer)

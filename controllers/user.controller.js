@@ -199,3 +199,20 @@ module.exports.getUserAndPet = (req, res) => {
             res.status(422).json({ error })
         });
 }
+
+module.exports.feedback = async (req, res) => {
+    try {
+        let sql = `INSERT INTO feedback(uid, content, img) VALUES (:uid, :content, :img)`;
+        const results = await db.query(sql, { replacements: { uid: req.userId, content: req.body.content, img: req.body.img || null } });
+        res.json({
+            result: 'ok',
+            data: {
+                id: results[0],
+                uid: req.userId,
+                ...req.body
+            }
+        })
+    } catch (error) {
+        res.status(422).json({ error: error })
+    }
+}

@@ -237,3 +237,19 @@ module.exports.isMatch = (req, res) => {
             res.status(422).json({ error: error })
         });
 }
+
+module.exports.report = (req, res) => {
+    let sql = 'INSERT INTO report(pet_id, reason, report_by) VALUES (:pet_id, :reason, :report_by)';
+    db.query(sql, { replacements: { report_by: req.userId, ...req.body } })
+        .then(results => {
+            res.json({
+                result: 'ok',
+                data: {
+                    id: results[0],
+                    report_by: req.userId,
+                    ...req.body
+                }
+            })
+        })
+        .catch(error => res.status(422).json({ error: error }));
+}
