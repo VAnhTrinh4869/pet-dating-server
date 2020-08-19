@@ -124,7 +124,7 @@ const getUsersLocation = async (req) => {
         let sql = `SELECT u.uid, u.name, u.avatar, u.is_vip,l.latitude, l.longitude
                 FROM user u
                 INNER JOIN location l ON u.uid = l.user_id
-                WHERE u.uid != :user_id`;
+                WHERE u.uid != :user_id AND u.hide = 0`;
         return await db.query(sql, { replacements: { user_id: req.userId }, type: db.QueryTypes.SELECT })
     } catch (error) {
         throw error
@@ -179,7 +179,7 @@ module.exports.getUserAndPet = (req, res) => {
     let sql = `SELECT u.name, u.email, u.gender, u.birth_date, u.phone, u.avatar, u.is_vip, p.id AS pet_id, p.avatar AS pet_avatar
             FROM user u 
             LEFT JOIN pet p ON u.uid = p.user_id
-            WHERE u.uid = :uid`;
+            WHERE u.uid = :uid AND u.hide = 0`;
     db.query(sql, { replacements: { uid: req.params.uid }, type: db.QueryTypes.SELECT })
         .then(users => {
             const pets = users.map(u => ({ id: u.pet_id, avatar: u.pet_avatar }))

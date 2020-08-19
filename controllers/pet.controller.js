@@ -12,7 +12,8 @@ module.exports.getOthersPet = (req, res) => {
     let sql = `SELECT p.id, p.user_id, p.name, p.avatar, GROUP_CONCAT(pf.img_url) AS pictures 
             FROM pet p
             LEFT JOIN pet_feature pf ON p.id = pf.pet_id
-            WHERE p.user_id != :user_id AND p.breed = :breed AND p.gender != :gender 
+            INNER JOIN user u ON u.uid = p.user_id
+            WHERE p.user_id != :user_id AND p.breed = :breed AND p.gender != :gender AND u.hide = 0
             AND NOT EXISTS(
                 SELECT * FROM pet_match pm 
                 WHERE pm.pet_id1 = :pet_active AND pm.pet_id2 = p.id
@@ -35,7 +36,8 @@ module.exports.getAllOthersPet = (req, res) => {
     let sql = `SELECT p.id, p.user_id, p.name, p.avatar, GROUP_CONCAT(pf.img_url) AS pictures 
             FROM pet p
             LEFT JOIN pet_feature pf ON p.id = pf.pet_id
-            WHERE p.user_id != :user_id 
+            INNER JOIN user u ON u.uid = p.user_id
+            WHERE p.user_id != :user_id AND u.hide = 0
             GROUP BY p.id
             ORDER BY RAND() LIMIT 50`;
     db.query(sql, { replacements: { user_id: req.userId }, type: db.QueryTypes.SELECT })
