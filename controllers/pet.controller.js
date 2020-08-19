@@ -241,7 +241,7 @@ module.exports.isMatch = (req, res) => {
 }
 
 module.exports.report = (req, res) => {
-    let sql = 'INSERT INTO report(pet_id, reason, report_by) VALUES (:pet_id, :reason, :report_by)';
+    let sql = 'INSERT INTO report(pet_id, reason, report_by, img) VALUES (:pet_id, :reason, :report_by, :img)';
     db.query(sql, { replacements: { report_by: req.userId, ...req.body } })
         .then(results => {
             res.json({
