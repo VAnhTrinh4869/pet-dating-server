@@ -250,6 +250,8 @@ module.exports.doVIP = async (req, res) => {
     try {
         let sql = `SELECT * FROM user_vip WHERE uid = :uid ORDER BY id DESC LIMIT 1`;
         const results = await db.query(sql, { replacements: { uid: req.userId }, type: db.QueryTypes.SELECT });
+
+        console.log(results)
         if (results.length == 0) {
             res.json({
                 vip: 0,
@@ -270,7 +272,7 @@ module.exports.doVIP = async (req, res) => {
             case ACTIVE:
                 let now = new Date().getMilliseconds()
                 let to = new Date(to_date).getMilliseconds()
-                if (now > to) {
+                if (now == to) {
                     common.disableVIP(id)
                     res.json({
                         vip: 0,
