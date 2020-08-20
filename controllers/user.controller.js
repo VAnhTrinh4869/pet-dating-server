@@ -272,6 +272,7 @@ module.exports.doVIP = async (req, res) => {
             case ACTIVE:
                 let now = new Date().getMilliseconds()
                 let to = new Date(to_date).getMilliseconds()
+                console.log('now', now, 'to', to)
                 if (now == to) {
                     common.disableVIP(id)
                     res.json({
