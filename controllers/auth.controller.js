@@ -51,10 +51,20 @@ module.exports.insertNewUser = async (req, res) => {
                             remainTime: `${h}h ${m}m ${s}s`,
                         }
                     })
-                    return;
+                    return
                 } else {
                     //open
-                    await common.enableUser(req.body.uid)
+                    common.enableUser(req.body.uid)
+                    res.json({
+                        result: 'ok',
+                        data: {
+                            ...user[0],
+                            is_block: 0
+                        },
+                        pd_token: jwt.sign({ userId: user[0].uid }, process.env.JWT_KEY),
+                        message: 'login successfully!'
+                    })
+                    return
                 }
             }
             res.json({

@@ -5,6 +5,8 @@ const controller = require('../controllers/user.controller');
 
 router.get('/currentUser', controller.getCurrentUser);
 
+router.get('/vip', controller.doVIP);
+
 router.get('/filter', controller.filter);
 
 router.get('/:uid', controller.get);

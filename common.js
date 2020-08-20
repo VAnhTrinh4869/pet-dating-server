@@ -34,3 +34,12 @@ module.exports.enableUser = async (uid) => {
         throw error
     }
 }
+
+module.exports.disableVIP = async (id) => {
+    try {
+        let sql = `UPDATE user_vip SET status = 'IN_ACTIVE' WHERE id = :id`;
+        return await db.query(sql, { replacements: { id: id }, type: db.QueryTypes.UPDATE })
+    } catch (error) {
+        throw error
+    }
+}

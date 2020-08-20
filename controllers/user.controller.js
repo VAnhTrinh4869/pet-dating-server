@@ -2,6 +2,7 @@ const geolib = require('geolib');
 
 const db = require('../db');
 const common = require('../common');
+const moment = require('moment');
 
 module.exports.getCurrentUser = async (req, res) => {
     try {
@@ -20,10 +21,15 @@ module.exports.getCurrentUser = async (req, res) => {
                     is_block: 1,
                     remainTime: `${h}h ${m}m ${s}s`
                 })
-                return;
+                return
             } else {
                 //open
                 await common.enableUser(req.userId)
+                res.json({
+                    ...user[0],
+                    is_block: 0
+                })
+                return
             }
         }
         res.json({
@@ -160,17 +166,36 @@ module.exports.filter = async (req, res) => {
 
 module.exports.upgradeToPremium = async (req, res) => {
     try {
-        let sql = `INSERT INTO user_vip(uid, confirm_img) VALUES (:uid, :confirm_img)`;
-        const results = await db.query(sql, { replacements: { uid: req.userId, confirm_img: req.body.confirm_img } });
+        let sql = `INSERT INTO user_vip(uid, confirm_img, from_date, to_date ) VALUES (:uid, :confirm_img, :from_date, :to_date)`;
+        let from = moment(new Date(), 'YYYY-MM-DD hh:mm:ss').toDate()
+        let to;
+        switch (req.body.vip_term) {
+            case '1M':
+                to = moment(from).add(1, 'months').toDate()
+                break;
+            case '3M':
+                to = moment(from).add(3, 'months').toDate()
+                break;
+            case '1Y':
+                to = moment(from).add(1, 'year').toDate()
+                break;
+            default:
+                break;
+        }
+
+        const results = await db.query(sql, { replacements: { uid: req.userId, confirm_img: req.body.confirm_img, from_date: from, to_date: to } });
         res.json({
             result: 'ok',
             data: {
                 id: results[0],
                 uid: req.userId,
-                confirm_img: req.body.confirm_img
+                confirm_img: req.body.confirm_img,
+                from_date: from,
+                to_date: to
             }
         })
     } catch (error) {
+        console.log(error)
         res.status(422).json({ error: error })
     }
 }
@@ -212,6 +237,63 @@ module.exports.feedback = async (req, res) => {
                 ...req.body
             }
         })
+    } catch (error) {
+        res.status(422).json({ error: error })
+    }
+}
+
+module.exports.doVIP = async (req, res) => {
+    const PROCESS = 'PROCESS'
+    const ACTIVE = 'ACTIVE'
+    const IN_ACTIVE = 'IN_ACTIVE'
+
+    try {
+        let sql = `SELECT * FROM user_vip WHERE uid = :uid ORDER BY id DESC LIMIT 1`;
+        const results = await db.query(sql, { replacements: { uid: req.userId }, type: db.QueryTypes.SELECT });
+        if (results.length == 0) {
+            res.json({
+                vip: 0,
+                status: IN_ACTIVE
+            })
+            return
+        }
+
+        const { status, to_date, id } = results[0];
+
+        switch (status) {
+            case PROCESS:
+                res.json({
+                    vip: 0,
+                    status: PROCESS
+                })
+                break;
+            case ACTIVE:
+                let now = new Date().getMilliseconds()
+                let to = new Date(to_date).getMilliseconds()
+                if (now > to) {
+                    common.disableVIP(id)
+                    res.json({
+                        vip: 0,
+                        status: IN_ACTIVE
+                    })
+                    return
+                }
+                res.json({
+                    vip: 1,
+                    status: ACTIVE,
+                    remainTime: to_date
+                })
+                break;
+            case IN_ACTIVE:
+                res.json({
+                    vip: 0,
+                    status: IN_ACTIVE
+                })
+                break;
+            default:
+                break;
+
+        }
     } catch (error) {
         res.status(422).json({ error: error })
     }
