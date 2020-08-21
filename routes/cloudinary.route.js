@@ -11,7 +11,6 @@ router.post('/upload', upload.array('pictures'), async (req, res) => {
     const uploader = async (path) => await cloudinary.uploads(path, 'pet-next-generation');
 
     const files = req.files
-    console.log(files)
     const urls = []
     for (const file of files) {
         const { path } = file;
