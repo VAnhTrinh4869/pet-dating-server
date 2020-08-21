@@ -15,13 +15,6 @@ module.exports.getProfile = (req, res) => {
         .catch(error => res.json({ error: error }));
 }
 
-module.exports.upload = (req, res) => {
-    res.json({
-        success: 'ok',
-        img_url: `${req.get('host')}/images/${req.file.filename}`
-    })
-}
-
 module.exports.react = (req, res) => {
     let sql = 'INSERT INTO pet_reaction(user_id, pet_id, reaction) VALUES (:user_id, :pet_id, :reaction)';
     db.query(sql, { replacements: { user_id: req.userId, pet_id: req.body.pet_id, reaction: req.body.reaction } })
