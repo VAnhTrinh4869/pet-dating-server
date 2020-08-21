@@ -127,7 +127,7 @@ module.exports.setLocation = async (req, res) => {
 
 const getUsersLocation = async (req) => {
     try {
-        let sql = `SELECT u.uid, u.name, u.avatar, u.is_vip,l.latitude, l.longitude
+        let sql = `SELECT u.uid, u.name, u.avatar, l.latitude, l.longitude
                 FROM user u
                 INNER JOIN location l ON u.uid = l.user_id
                 WHERE u.uid != :user_id AND u.hide = 0`;
@@ -150,7 +150,6 @@ module.exports.filter = async (req, res) => {
                 uid: user.uid,
                 name: user.name,
                 avatar: user.avatar,
-                is_vip: user.is_vip || 0,
                 distance: disToKm
             }
         }).filter(user => user.distance <= DISTANCE).sort((a, b) => a.distance - b.distance)
@@ -201,7 +200,8 @@ module.exports.upgradeToPremium = async (req, res) => {
 }
 
 module.exports.getUserAndPet = (req, res) => {
-    let sql = `SELECT u.name, u.email, u.gender, u.birth_date, u.phone, u.avatar, u.is_vip, p.id AS pet_id, p.avatar AS pet_avatar
+    let sql = `SELECT u.name, u.email, u.gender, u.birth_date, u.phone, u.avatar, p.id AS pet_id, p.avatar AS pet_avatar,
+            (SELECT COUNT(1) FROM  user_vip uv WHERE uv.uid = :uid AND STATUS = 'ACTIVE' ORDER BY uv.id DESC LIMIT 1) AS vip
             FROM user u 
             LEFT JOIN pet p ON u.uid = p.user_id
             WHERE u.uid = :uid AND u.hide = 0`;
@@ -216,7 +216,7 @@ module.exports.getUserAndPet = (req, res) => {
                 birth_date: user.birth_date,
                 phone: user.phone,
                 avatar: user.avatar,
-                is_vip: user.is_vip,
+                vip: user.vip,
                 pets: pets
             })
         })
@@ -251,7 +251,6 @@ module.exports.doVIP = async (req, res) => {
         let sql = `SELECT * FROM user_vip WHERE uid = :uid ORDER BY id DESC LIMIT 1`;
         const results = await db.query(sql, { replacements: { uid: req.userId }, type: db.QueryTypes.SELECT });
 
-        console.log(results)
         if (results.length == 0) {
             res.json({
                 vip: 0,
@@ -272,7 +271,6 @@ module.exports.doVIP = async (req, res) => {
             case ACTIVE:
                 let now = new Date().getMilliseconds()
                 let to = new Date(to_date).getMilliseconds()
-                console.log('now', now, 'to', to)
                 if (now == to) {
                     common.disableVIP(id)
                     res.json({
