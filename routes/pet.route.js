@@ -17,6 +17,8 @@ router.get('/topMatch', controller.getTopMatch);
 
 router.get('/isMatch', controller.isMatch);
 
+router.get('/nextGeneration', controller.nextGeneration);
+
 router.get('/:id', controller.get);
 
 router.get('/:id/allInfo', controller.getAllInfomation);
