@@ -260,7 +260,11 @@ module.exports.nextGeneration = (req, res) => {
     let sql = 'SELECT img FROM pet_generation WHERE breed = :breed ORDER BY RAND() LIMIT 1';
     db.query(sql, { replacements: { breed: req.query.breed }, type: db.QueryTypes.SELECT })
         .then(results => {
-            res.json(results[0])
+            if (results.length == 0) {
+                res.json({ img: '' })
+            } else {
+                res.json(results[0])
+            }
         })
         .catch(error => res.status(422).json({ error: error }));
 }
