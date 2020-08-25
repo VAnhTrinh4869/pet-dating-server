@@ -268,3 +268,18 @@ module.exports.nextGeneration = (req, res) => {
         })
         .catch(error => res.status(422).json({ error: error }));
 }
+
+module.exports.getPetMatch = (req, res) => {
+    let sql = `SELECT p.id, p.avatar FROM pet_match pm 
+            INNER JOIN pet p ON pm.pet_id2 = p.id
+            WHERE user1 = :uid AND user2 = :guest 
+            AND EXISTS (
+                SELECT * FROM pet_match pm2
+                WHERE pm.pet_id1 = pm2.pet_id2 AND pm.pet_id2 = pm2.pet_id1
+            )`;
+    db.query(sql, { replacements: { uid: req.userId, guest: req.query.guest }, type: db.QueryTypes.SELECT })
+        .then(results => {
+            res.json(results)
+        })
+        .catch(error => res.status(422).json({ error: error }));
+}

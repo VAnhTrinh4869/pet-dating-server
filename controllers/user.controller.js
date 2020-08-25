@@ -41,7 +41,9 @@ module.exports.getCurrentUser = async (req, res) => {
 }
 
 module.exports.get = (req, res) => {
-    let sql = 'SELECT * FROM user WHERE uid = :uid';
+    let sql = `SELECT u.*,
+            (SELECT COUNT(1) FROM  user_vip uv WHERE uv.uid = :uid AND STATUS = 'ACTIVE' ORDER BY uv.id DESC LIMIT 1) AS vip
+            FROM user u WHERE u.uid = :uid`;
     db.query(sql, { replacements: { uid: req.params.uid }, type: db.QueryTypes.SELECT })
         .then(user => {
             res.json(user)
