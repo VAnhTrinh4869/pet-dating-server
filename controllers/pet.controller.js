@@ -276,7 +276,8 @@ module.exports.getPetMatch = (req, res) => {
             AND EXISTS (
                 SELECT * FROM pet_match pm2
                 WHERE pm.pet_id1 = pm2.pet_id2 AND pm.pet_id2 = pm2.pet_id1
-            )`;
+            )
+            GROUP BY p.id`;
     db.query(sql, { replacements: { uid: req.userId, guest: req.query.guest }, type: db.QueryTypes.SELECT })
         .then(results => {
             res.json(results)
