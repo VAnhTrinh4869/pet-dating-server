@@ -214,6 +214,20 @@ module.exports.updateMatch = (req, res) => {
         .catch(error => res.status(422).json({ error: error }));
 }
 
+module.exports.minusMatch = (req, res) => {
+    let condition = req.body.pet_ids.join(',')
+    let sql = `UPDATE pet SET matches = matches - 1 WHERE id IN (${condition})`;
+
+    db.query(sql, { type: db.QueryTypes.UPDATE })
+        .then(result => {
+            res.json({
+                result: 'ok',
+                message: `${result[1]} row(s) affected`
+            })
+        })
+        .catch(error => res.status(422).json({ error: error }));
+}
+
 module.exports.getTopMatch = (req, res) => {
     let sql = `SELECT p.id, p.name, pb.name AS breed_name, p.avatar, p.age, p.gender, p.weight, matches 
             FROM pet p
@@ -270,17 +284,28 @@ module.exports.nextGeneration = (req, res) => {
 }
 
 module.exports.getPetMatch = (req, res) => {
-    let sql = `SELECT p.id, p.avatar FROM pet_match pm 
-            INNER JOIN pet p ON pm.pet_id2 = p.id
-            WHERE user1 = :uid AND user2 = :guest 
-            AND EXISTS (
-                SELECT * FROM pet_match pm2
-                WHERE pm.pet_id1 = pm2.pet_id2 AND pm.pet_id2 = pm2.pet_id1
-            )
-            GROUP BY p.id`;
-    db.query(sql, { replacements: { uid: req.userId, guest: req.query.guest }, type: db.QueryTypes.SELECT })
+    let sql = `SELECT p.id, p.avatar, p.name FROM pet_match pm 
+                INNER JOIN pet p ON pm.pet_id2 = p.id
+                WHERE pet_id1 = :pet_active AND user2 = :user2
+                AND EXISTS (
+                    SELECT * FROM pet_match pm2
+                    WHERE pm2.pet_id2 = :pet_active AND pm2.user1 = :user2
+                )`;
+    db.query(sql, { replacements: { ...req.query }, type: db.QueryTypes.SELECT })
         .then(results => {
             res.json(results)
+        })
+        .catch(error => res.status(422).json({ error: error }));
+}
+
+module.exports.unmatch = (req, res) => {
+    let sql = `DELETE FROM pet_match WHERE (pet_id1 = :pet_active AND pet_id2 = :pet2) OR (pet_id2 = :pet_active AND pet_id1 = :pet2)`
+    db.query(sql, { replacements: { ...req.body }, type: db.QueryTypes.UPDATE })
+        .then(result => {
+            res.json({
+                result: 'ok',
+                message: `${result[1]} row(s) affected`
+            })
         })
         .catch(error => res.status(422).json({ error: error }));
 }

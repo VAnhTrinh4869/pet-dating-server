@@ -33,7 +33,11 @@ router.post('/:id/pictures', controller.insertPictures);
 
 router.put('/setActive', controller.setActivePet);
 
+router.put('/unmatch', controller.unmatch);
+
 router.put('/updateMatch', controller.updateMatch);
+
+router.put('/minusMatch', controller.minusMatch);
 
 router.put('/:id', controller.updatePet);
 
