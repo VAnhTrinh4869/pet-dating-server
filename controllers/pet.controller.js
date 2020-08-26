@@ -289,7 +289,7 @@ module.exports.getPetMatch = (req, res) => {
                 WHERE pet_id1 = :pet_active AND user2 = :user2
                 AND EXISTS (
                     SELECT * FROM pet_match pm2
-                    WHERE pm2.pet_id2 = :pet_active AND pm2.user1 = :user2
+                    WHERE pm2.pet_id2 = pm.pet_id1 AND pm.pet_id2 = pm2.pet_id1
                 )`;
     db.query(sql, { replacements: { ...req.query }, type: db.QueryTypes.SELECT })
         .then(results => {
