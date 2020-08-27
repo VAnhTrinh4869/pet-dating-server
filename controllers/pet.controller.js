@@ -13,7 +13,7 @@ module.exports.getOthersPet = (req, res) => {
             FROM pet p
             LEFT JOIN pet_feature pf ON p.id = pf.pet_id
             INNER JOIN user u ON u.uid = p.user_id
-            WHERE p.user_id != :user_id AND p.breed = :breed AND p.gender != :gender AND u.hide = 0
+            WHERE p.user_id != :user_id AND p.breed = :breed AND p.gender != :gender AND u.hide = 0 AND u.is_delete = 0
             AND NOT EXISTS(
                 SELECT * FROM pet_match pm 
                 WHERE pm.pet_id1 = :pet_active AND pm.pet_id2 = p.id
@@ -37,7 +37,7 @@ module.exports.getAllOthersPet = (req, res) => {
             FROM pet p
             LEFT JOIN pet_feature pf ON p.id = pf.pet_id
             INNER JOIN user u ON u.uid = p.user_id
-            WHERE p.user_id != :user_id AND u.hide = 0
+            WHERE p.user_id != :user_id AND u.hide = 0 AND u.is_delete = 0
             GROUP BY p.id
             ORDER BY RAND() LIMIT 50`;
     db.query(sql, { replacements: { user_id: req.userId }, type: db.QueryTypes.SELECT })
@@ -189,6 +189,7 @@ module.exports.getAllInfomation = (req, res) => {
 module.exports.getTopLike = (req, res) => {
     let sql = `SELECT p.id, p.name, p.gender, p.avatar, COUNT(p.id) AS likes
             FROM pet_reaction pr
+            INNER JOIN user u ON pr.user_id = u.uid and u.is_delete = 0
             INNER JOIN pet p ON pr.pet_id = p.id
             GROUP BY p.id
             ORDER BY likes DESC
@@ -231,8 +232,9 @@ module.exports.minusMatch = (req, res) => {
 module.exports.getTopMatch = (req, res) => {
     let sql = `SELECT p.id, p.name, pb.name AS breed_name, p.avatar, p.age, p.gender, p.weight, matches 
             FROM pet p
+            INNER JOIN user u ON u.uid = p.user_id
             INNER JOIN pet_breed pb ON p.breed = pb.id
-            WHERE matches > 0
+            WHERE matches > 0 AND u.is_delete = 0
             ORDER BY matches DESC
             LIMIT 10`;
     db.query(sql, { type: db.QueryTypes.SELECT })
